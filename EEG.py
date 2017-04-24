@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[59]:
-
-get_ipython().magic(u'matplotlib qt')
 import mne
 import os
 import numpy as np
@@ -119,24 +113,6 @@ eeg_dat.plot()
 
 eeg_dat.plot_psd()
 
-
-# In[58]:
-
-notches = np.arange(60, 61, 60)
-eeg_dat.notch_filter(notches)
-eeg_dat.filter(1, 70, h_trans_bandwidth=10)
-eeg_dat.plot_psd()
-
-mne.time_frequency.morlet(256, [40], n_cycles = 7)
-
-events = mne.find_events(eeg_dat, shortest_event=0, stim_channel = 'STI 014')
-picks = mne.pick_types(eeg_dat.info, meg = False, eeg=True, stim=False, eog=False, exclude='bads')
-
-epochs = mne.Epochs(eeg_dat, events, event_id, tmin, tmax, proj=True, picks=picks, baseline=None, preload=True)
-
-
-# In[10]:
-
 notches = np.arange(60, 61, 60)
 eeg_dat.notch_filter(notches)
 filtered = eeg_dat.copy().filter(1, 70, h_trans_bandwidth=10)
@@ -148,21 +124,13 @@ filtered.plot_psd()
 filtered.info
 
 
-# In[12]:
-
-filtered.plot()
-
-
-# In[37]:
-
-filtered
-
-
 # In[35]:
 
 ch_names = filtered.info['ch_names']
 picks = filtered.pick_channels(ch_names=ch_names)
 
+
+filtered.get_data(picks=picks, start=0, stop=None)
 
 # In[33]:
 
