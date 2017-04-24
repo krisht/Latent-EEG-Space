@@ -106,17 +106,17 @@ eeg_dat.info
 
 # In[64]:
 
-eeg_dat.plot()
+#eeg_dat.plot()
 
 
 # In[65]:
 
-eeg_dat.plot_psd()
+#eeg_dat.plot_psd()
 
 notches = np.arange(60, 61, 60)
 eeg_dat.notch_filter(notches)
 filtered = eeg_dat.copy().filter(1, 70, h_trans_bandwidth=10)
-filtered.plot_psd()
+#filtered.plot_psd()
 
 
 # In[11]:
@@ -130,9 +130,15 @@ ch_names = filtered.info['ch_names']
 picks = filtered.pick_channels(ch_names=ch_names)
 
 
-filtered.get_data(picks=picks, start=0, stop=None)
+data = filtered.get_data(start=0)
+
+print(data.shape)
 
 # In[33]:
+
+data2 = mne.time_frequency.stft(data, wsize=140, tstep=2)
+
+print(data2.shape)
 
 
 
