@@ -3,11 +3,7 @@ import os
 import numpy as np
 from collections import defaultdict
 
-eeg_dat = mne.io.read_raw_edf('./a_1.edf', preload=True)
-
-
-
-
+eeg_dat = mne.io.read_raw_edf('./session1/a_.edf', preload=True);
 
 # Example of one way to start fixing up the channels
 #  Priority again is to keep everything consistent with MNE, so first check for MNE functions that can do 
