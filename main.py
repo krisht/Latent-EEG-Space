@@ -7,7 +7,7 @@ import random
 
 
 class BrainNet:
-    def __init__(self, input_shape=[22, 71, 125], num_output=128, num_classes=6, restore_dir=None):
+    def __init__(self, input_shape=[None, 22, 71, 125], num_output=128, num_classes=6, restore_dir=None):
         self.sess = tf.Session()
         if restore_dir is not None:
             dir = tf.train.Saver()
@@ -17,7 +17,7 @@ class BrainNet:
         self.num_classes = num_classes
 
     def build_model(self, input_shape, num_output):
-        self.inputs = tf.placeholder(tf.float32, shape=[None] + input_shape, name='input')
+        self.inputs = tf.placeholder(tf.float32, shape=input_shape, name='input')
         self.num_output = num_output
         self.input_shape = input_shape
         self.keep_prob = tf.placeholder(tf.float32)
@@ -67,5 +67,6 @@ class BrainNet:
 sample_input = tf.random_uniform([1, 22, 71, 125], dtype=tf.float32);
 
 
-
-brain_net = BrainNet()
+if __name__='__main__':
+    model = BrainNet()
+    model.train_model(learning=1e-3,keep_prob=0.5, train_data=, batch_size=64,train_epoch=5, validation_data=, validation_epoch=1)
