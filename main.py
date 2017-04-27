@@ -26,16 +26,29 @@ class BrainNet:
         with slim.arg_scope([slim.layers.conv2d, slim.layers.fully_connected],
                            weights_initializer=tf.contrib.layers.xavier_initializer(seed=random.random(), uniform=True),
                            weights_regularizer=slim.l2_regularizer(1e-3)):
+            print(self.inputs)
             net = slim.layers.conv2d(self.inputs, num_outputs=30, kernel_size=5, scope='conv1')
+            print(net)
             net = slim.layers.max_pool2d(net, 3, scope='pool1')
-            net = slim.layers.conv2d(net, num_outputs = 40, kernel_size=3, stride=1, scope='conv2')
+            print(net)
+            net = slim.layers.batch_norm(net)
+            print(net)
+            net = slim.layers.conv2d(net, num_outputs = 60, kernel_size=3, stride=1, scope='conv2')
+            print(net)
             net = slim.layers.max_pool2d(net, 2, stride=1, scope='pool2')
             print(net)
+            net = slim.layers.batch_norm(net)
+            print(net)
             net = slim.layers.flatten(net, scope='flatten')
+            print(net)
             net = slim.layers.fully_connected(net, 256)
+            print(net)
             net = slim.layers.dropout(net, keep_prob = self.keep_prob)
+            print(net)
             net = slim.layers.fully_connected(net, 128)
+            print(net)
             net = slim.layers.fully_connected(net, num_output, activation_fn=None, weights_regularizer=None)
+            print(net)
             self.net = net
             print(self.net)
 
@@ -67,6 +80,4 @@ class BrainNet:
 sample_input = tf.random_uniform([1, 22, 71, 125], dtype=tf.float32);
 
 
-if __name__='__main__':
-    model = BrainNet()
-    model.train_model(learning=1e-3,keep_prob=0.5, train_data=, batch_size=64,train_epoch=5, validation_data=, validation_epoch=1)
+model = BrainNet()
