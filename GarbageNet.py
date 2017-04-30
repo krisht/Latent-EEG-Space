@@ -139,8 +139,5 @@ class BrainNet:
 
 
 
-sample_input = tf.random_uniform([1, 22, 71, 125], dtype=tf.float32);
-
-
 model = BrainNet()
 model.train_model(learning_rate=1e-3, keep_prob=0.5, train_data="", batch_size=50, train_epoch=10)
