@@ -719,10 +719,7 @@ class BrainNet:
         class_list=[]
 
         for ii in range(0, size):
-
-            if choice == None:
-                choices = ['bckg', 'eybl', 'gped', 'spsw', 'pled', 'artf']
-                choice = random.choice(choices)
+            choice = random.choice(['bckg', 'eybl', 'gped', 'spsw', 'pled', 'artf'])
 
             if choice == 'bckg':
                 ii = random.randint(0, len(self.bckg) - 1)
@@ -753,37 +750,39 @@ class BrainNet:
 
         return data_list, class_list
 
-
-
     def validate(self):
-        self.load_files()
 
-        inputs, classes = self.get_sample(size=10000)
+        inputs, classes = self.get_sample(size=1000)
 
         vector_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: inputs})
 
         knn = neighbors.KNeighborsClassifier()
         knn.fit(vector_inputs, classes)
 
-        val_inputs, val_classes = self.get_sample(size=1000)
+        val_inputs, val_classes = self.get_sample(size=100)
 
+        vector_val_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: val_inputs})
 
-        pred_class = knn.predict(val_inputs)
+        pred_class = knn.predict(vector_val_inputs)
+
+        print(val_classes)
+        print(pred_class)
 
         percentage = len([i for i, j in zip(val_classes, pred_class) if i==j])
 
         print("Validation Results: %d out of 1000 correct" %  percentage )
 
+
+
 if __name__ == "__main__":
     try:
         sess = tf.Session()
         model = BrainNet(sess=sess, restore_dir='previous_run/latest_weights.ckpt')
+        model.validate()
         print('Krisna you\'re a dolt')
     except (KeyboardInterrupt, SystemError, SystemExit):
         save_model(sess, saver)
         get_loss(loss_mem)
-    save_model(sess, saver)
-    get_loss(loss_mem)
 
 #
 # sess = tf.Session()
