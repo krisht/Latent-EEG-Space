@@ -13,6 +13,8 @@ sess = None
 
 loss_mem = []
 
+#Garbage to make it pull properly
+
 
 bckg_num = 0
 artf_num = 1
