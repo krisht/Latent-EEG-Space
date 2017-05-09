@@ -524,15 +524,11 @@ class BrainNet:
         self.num_classes = num_classes
         self.num_output = num_output
         self.input_shape = input_shape
+        self.inference_input = tf.placeholder(tf.float32, shape=input_shape)
+        self.inference_model = self.get_model(self.inference_input, reuse=False)
         if restore_dir is not None:
             dir = tf.train.Saver()
             dir.restore(self.sess, restore_dir)
-        else:
-            # only for inference time usage....
-            # i.e you give it a sample and it determines the embedding. This is for use in a k-cluster sort algorithm
-            # Not for training
-            self.inference_input = tf.placeholder(tf.float32, shape=input_shape)
-            self.inference_model = self.get_model(self.inference_input, reuse=False)
 
         print(len(self.ARTF))
         print(len(self.BCKG))
@@ -776,17 +772,16 @@ class BrainNet:
 
         print("Validation Results: %d out of 1000 correct" %  percentage )
 
-
-try:
-    sess = tf.Session()
-    model = BrainNet(sess=sess)
-    saver = tf.train.Saver()
-    model.train_model(learning_rate=1e-3, keep_prob=0.5, batch_size=100, train_epoch=20)
-except (KeyboardInterrupt, SystemError, SystemExit):
+if __name__ == "__main__":
+    try:
+        sess = tf.Session()
+        model = BrainNet(sess=sess, restore_dir='previous_run/latest_weights.ckpt')
+        print('Krisna you\'re a dolt')
+    except (KeyboardInterrupt, SystemError, SystemExit):
+        save_model(sess, saver)
+        get_loss(loss_mem)
     save_model(sess, saver)
     get_loss(loss_mem)
-save_model(sess, saver)
-get_loss(loss_mem)
 
 #
 # sess = tf.Session()
