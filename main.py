@@ -44,11 +44,16 @@ class BrainNet:
     def __init__(self, sess, input_shape=[None, 71, 125], num_output=64, num_classes=6, restore_dir=None):
 
         path = os.path.abspath('/media/krishna/My Passport/DataForUsage/labeled')
-
         self.ARTF = [os.path.join(dp, f) for dp, dn, filenames in os.walk(path) for f in filenames if
                      'artf' in os.path.join(dp, f) and 'npz' in os.path.join(dp, f)]
+        self.ARTF_VAL = self.ARTF[:len(self.ARTF)/2]
+        self.ARTF = self.ARTF[len(self.ARTF)/2:]
+
         self.BCKG = [os.path.join(dp, f) for dp, dn, filenames in os.walk(path) for f in filenames if
                      'bckg' in os.path.join(dp, f) and 'npz' in os.path.join(dp, f)]
+        self.BCKG_VAL = self.ARTF[:len(self.BCKG)/2]
+        self.BCKG = self.ARTF[len(self.BCKG)/2:]
+
         self.SPSW = ['/media/krishna/My Passport/DataForUsage/labeled/session10/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session11/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session112/spsw0.npz',
@@ -212,8 +217,8 @@ class BrainNet:
                      '/media/krishna/My Passport/DataForUsage/labeled/session326/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session327/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session328/spsw0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session329/spsw0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session33/spsw0.npz',
+                     '/media/krishna/My Passport/DataForUsage/labeled/session329/spsw0.npz']
+        self.SPSW_VAL = ['/media/krishna/My Passport/DataForUsage/labeled/session33/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session331/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session332/spsw0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session333/spsw0.npz',
@@ -246,8 +251,8 @@ class BrainNet:
                      '/media/krishna/My Passport/DataForUsage/labeled/session247/pled0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session248/pled0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session299/pled0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session300/pled0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session301/pled0.npz',
+                     '/media/krishna/My Passport/DataForUsage/labeled/session300/pled0.npz']
+        self.PLED_VAL = ['/media/krishna/My Passport/DataForUsage/labeled/session301/pled0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session31/pled0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session317/pled0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session319/pled0.npz',
@@ -260,8 +265,8 @@ class BrainNet:
                      '/media/krishna/My Passport/DataForUsage/labeled/session123/gped0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session125/gped0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session168/gped0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session181/gped0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session283/gped0.npz',
+                     '/media/krishna/My Passport/DataForUsage/labeled/session181/gped0.npz']
+        self.GPED_VAL = ['/media/krishna/My Passport/DataForUsage/labeled/session283/gped0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session284/gped0.npz']
         self.EYBL = ['/media/krishna/My Passport/DataForUsage/labeled/session0/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session1/eybl0.npz',
@@ -499,8 +504,8 @@ class BrainNet:
                      '/media/krishna/My Passport/DataForUsage/labeled/session35/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session359/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session36/eybl0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session360/eybl0.npz',
-                     '/media/krishna/My Passport/DataForUsage/labeled/session363/eybl0.npz',
+                     '/media/krishna/My Passport/DataForUsage/labeled/session360/eybl0.npz']
+        self.EYBL_VAL = ['/media/krishna/My Passport/DataForUsage/labeled/session363/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session364/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session365/eybl0.npz',
                      '/media/krishna/My Passport/DataForUsage/labeled/session366/eybl0.npz',
@@ -555,14 +560,22 @@ class BrainNet:
             loss = tf.reduce_mean(basic_loss)
             return loss
 
-    def load_files(self):
+    def load_files(self, validate=False):
         print("Loading New Source Files...")
-        self.bckg = np.load(random.choice(self.BCKG))['arr_0']
-        self.eybl = np.load(random.choice(self.EYBL))['arr_0']
-        self.artf = np.load(random.choice(self.ARTF))['arr_0']
-        self.gped = np.load(random.choice(self.GPED))['arr_0']
-        self.pled = np.load(random.choice(self.PLED))['arr_0']
-        self.spsw = np.load(random.choice(self.SPSW))['arr_0']
+        if not validate:
+            self.bckg = np.load(random.choice(self.BCKG))['arr_0']
+            self.eybl = np.load(random.choice(self.EYBL))['arr_0']
+            self.artf = np.load(random.choice(self.ARTF))['arr_0']
+            self.gped = np.load(random.choice(self.GPED))['arr_0']
+            self.pled = np.load(random.choice(self.PLED))['arr_0']
+            self.spsw = np.load(random.choice(self.SPSW))['arr_0']
+        else:
+            self.bckg = np.load(random.choice(self.BCKG_VAL))['arr_0']
+            self.eybl = np.load(random.choice(self.EYBL_VAL))['arr_0']
+            self.artf = np.load(random.choice(self.ARTF_VAL))['arr_0']
+            self.gped = np.load(random.choice(self.GPED_VAL))['arr_0']
+            self.pled = np.load(random.choice(self.PLED_VAL))['arr_0']
+            self.spsw = np.load(random.choice(self.SPSW_VAL))['arr_0']
 
     def get_triplets(self):
 
@@ -657,6 +670,7 @@ class BrainNet:
             net = slim.layers.fully_connected(net, 1024, scope='fc2', trainable=True)
             net = slim.layers.fully_connected(net, self.num_output, activation_fn=None, weights_regularizer=None,
                                               scope='output')
+            
             return net
 
     def train_model(self, learning_rate, keep_prob, batch_size, train_epoch, outdir=None):
@@ -714,7 +728,7 @@ class BrainNet:
             self.validate()
             self.load_files()
 
-    def get_sample(self, choice = None, size = 1):
+    def get_sample(self, size = 1):
         data_list=[]
         class_list=[]
 
@@ -751,26 +765,25 @@ class BrainNet:
         return data_list, class_list
 
     def validate(self):
+        self.load_files(True)
 
-        inputs, classes = self.get_sample(size=1000)
+        for _ in range(0, 5):
+            inputs, classes = self.get_sample(size=1000)
 
-        vector_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: inputs})
+            vector_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: inputs})
 
-        knn = neighbors.KNeighborsClassifier()
-        knn.fit(vector_inputs, classes)
+            knn = neighbors.KNeighborsClassifier()
+            knn.fit(vector_inputs, classes)
 
-        val_inputs, val_classes = self.get_sample(size=100)
+            val_inputs, val_classes = self.get_sample(size=100)
 
-        vector_val_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: val_inputs})
+            vector_val_inputs = self.sess.run(self.inference_model, feed_dict={self.inference_input: val_inputs})
 
-        pred_class = knn.predict(vector_val_inputs)
+            pred_class = knn.predict(vector_val_inputs)
 
-        print(val_classes)
-        print(pred_class)
+            percentage = len([i for i, j in zip(val_classes, pred_class) if i==j])
 
-        percentage = len([i for i, j in zip(val_classes, pred_class) if i==j])
-
-        print("Validation Results: %d out of 1000 correct" %  percentage )
+            print("Validation Results: %d out of 100 correct" %  percentage )
 
 
 
@@ -779,7 +792,6 @@ if __name__ == "__main__":
         sess = tf.Session()
         model = BrainNet(sess=sess, restore_dir='previous_run/latest_weights.ckpt')
         model.validate()
-        print('Krisna you\'re a dolt')
     except (KeyboardInterrupt, SystemError, SystemExit):
         save_model(sess, saver)
         get_loss(loss_mem)
